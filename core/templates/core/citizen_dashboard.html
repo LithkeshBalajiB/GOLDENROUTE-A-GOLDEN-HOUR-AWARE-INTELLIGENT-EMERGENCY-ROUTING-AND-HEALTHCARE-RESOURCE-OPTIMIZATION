@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h3>Citizen Dashboard</h3>
+
+<p><b>Name:</b> {{ profile.name }}</p>
+<p><b>Aadhar:</b> {{ profile.aadhar_number }}</p>
+
+<a href="/edit-profile/">
+<button>Edit Health Profile</button>
+</a>
+
+<hr>
+
+<h3>🚨 Emergency Distress Signal</h3>
+
+<div class="alert">
+
+<p>
+If you are in danger or need medical assistance,
+press the distress button to notify the nearest ambulance.
+</p>
+
+<form method="POST" action="/distress/">
+
+{% csrf_token %}
+
+<label>Your Latitude</label>
+<input type="text" name="lat" required>
+
+<label>Your Longitude</label>
+<input type="text" name="lng" required>
+
+<button style="background:red;font-size:18px;">
+🚨 SEND DISTRESS SIGNAL
+</button>
+
+</form>
+
+</div>
+
+{% endblock %}

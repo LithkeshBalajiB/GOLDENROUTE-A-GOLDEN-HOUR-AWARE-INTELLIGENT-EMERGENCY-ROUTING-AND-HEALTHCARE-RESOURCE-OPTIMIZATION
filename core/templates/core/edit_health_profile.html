@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Create Health Profile</h2>
+
+<form method="POST">
+
+{% csrf_token %}
+
+<label>Name</label>
+<input type="text" name="name" required>
+
+<label>Aadhar Number</label>
+<input type="text" name="aadhar_number" required>
+
+<label>Age</label>
+<input type="number" name="age">
+
+<label>Blood Group</label>
+<input type="text" name="blood_group">
+
+<label>Medical Comments</label>
+<textarea name="comments"></textarea>
+
+<label>Emergency Contact</label>
+<input type="text" name="emergency_contact">
+
+<button>Create Profile</button>
+
+</form>
+
+{% endblock %}

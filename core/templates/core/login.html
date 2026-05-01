@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h3>Login</h3>
+
+<form method="POST">
+
+{% csrf_token %}
+
+<label>Username</label>
+<input type="text" name="username" required>
+
+<label>Password</label>
+<input type="password" name="password" required>
+
+<button type="submit">Login</button>
+
+</form>
+
+<br>
+
+<a href="/citizen-signup/">
+<button>Create Citizen Account</button>
+</a>
+
+{% if last_citizen %}
+
+<div class="success">
+
+<h3>Last Citizen Logged In</h3>
+
+<b>Name:</b> {{ last_citizen.name }} <br>
+<b>Aadhar:</b> {{ last_citizen.aadhar}}
+
+</div>
+
+{% endif %}
+{% endblock %}

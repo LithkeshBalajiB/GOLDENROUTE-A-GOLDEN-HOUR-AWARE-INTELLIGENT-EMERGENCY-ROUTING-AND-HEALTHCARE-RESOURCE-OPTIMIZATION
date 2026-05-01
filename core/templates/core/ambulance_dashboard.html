@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>🚑 Ambulance Dashboard</h2>
+
+<!-- ========================= -->
+<!-- UPDATE LOCATION -->
+<!-- ========================= -->
+
+<h3>📍 Update Ambulance Location</h3>
+
+<form method="POST">
+
+{% csrf_token %}
+
+<label>Latitude</label>
+<input type="text" name="current_lat">
+
+<label>Longitude</label>
+<input type="text" name="current_lng">
+
+<button name="update_location">
+Update Location
+</button>
+
+</form>
+
+<p>
+
+<b>Last Updated Location</b><br>
+
+Latitude: {{ user.userprofile.latitude }} <br>
+Longitude: {{ user.userprofile.longitude }} <br>
+
+Last Updated: {{ user.userprofile.location_updated_at }}
+
+</p>
+
+<hr>
+
+<!-- ========================= -->
+<!-- DISTRESS SIGNALS -->
+<!-- ========================= -->
+
+<h3>🚨 Distress Signals</h3>
+
+{% for signal in signals %}
+
+<div class="alert">
+
+<b>Citizen:</b> {{ signal.citizen.name }} <br>
+<b>Aadhar:</b> {{ signal.citizen.aadhar_number }} <br>
+<b>Phone:</b> {{ signal.emergency_phone }} <br>
+
+<b>Location:</b>
+{{ signal.latitude }},
+{{ signal.longitude }}
+
+<br><br>
+
+<a target="_blank"
+href="https://www.google.com/maps/dir/?api=1&origin={{ user.userprofile.latitude }},{{ user.userprofile.longitude }}&destination={{ signal.latitude }},{{ signal.longitude }}">
+
+<button>🚑 Navigate to Citizen</button>
+
+</a>
+
+</div>
+
+{% empty %}
+
+<p>No distress signals</p>
+
+{% endfor %}
+
+<hr>
+
+<!-- ========================= -->
+<!-- FIND HOSPITALS -->
+<!-- ========================= -->
+
+<h3>Find Hospital for Patient</h3>
+
+<form method="POST">
+
+{% csrf_token %}
+
+<label>Patient Type</label>
+
+<select name="patient_type" required>
+
+<option value="cardiac">Cardiac</option>
+<option value="neuro">Neuro</option>
+<option value="trauma">Trauma</option>
+
+</select>
+
+<label>Accident Latitude</label>
+<input type="text" name="ambulance_lat" required>
+
+<label>Accident Longitude</label>
+<input type="text" name="ambulance_lng" required>
+
+<button type="submit" name="find_hospitals">
+🔎 Find Hospitals
+</button>
+
+</form>
+
+<hr>
+
+<!-- ========================= -->
+<!-- SEARCH BAR -->
+<!-- ========================= -->
+
+{% if hospitals %}
+
+<h3>Search Hospital</h3>
+
+<input type="text"
+id="hospitalSearch"
+placeholder="Search hospital..."
+onkeyup="filterHospitals()">
+
+<form method="POST">
+
+{% csrf_token %}
+
+<input type="hidden" name="ambulance_lat" value="{{ ambulance_lat }}">
+<input type="hidden" name="ambulance_lng" value="{{ ambulance_lng }}">
+<input type="hidden" name="patient_type" value="{{ patient_type }}">
+
+<table id="hospitalTable">
+
+<tr>
+
+<th>Select</th>
+<th>Hospital</th>
+<th>ER Rooms</th>
+<th>ICU Beds</th>
+<th>Cardiologist</th>
+<th>Neurosurgeon</th>
+<th>Trauma Team</th>
+<th>ETA</th>
+
+</tr>
+
+{% for hospital in hospitals %}
+
+<tr
+{% if best_hospital and hospital.id == best_hospital.id %}
+class="recommended"
+{% endif %}
+>
+
+<td>
+<input type="radio"
+name="hospital_id"
+value="{{ hospital.id }}"
+required>
+</td>
+
+<td>{{ hospital.name }}</td>
+
+<td>{{ hospital.er_rooms_available }}</td>
+
+<td>{{ hospital.icu_beds_available }}</td>
+
+<td>
+{% if hospital.cardiologist_available %}✅{% else %}❌{% endif %}
+</td>
+
+<td>
+{% if hospital.neurosurgeon_available %}✅{% else %}❌{% endif %}
+</td>
+
+<td>
+{% if hospital.trauma_team_available %}✅{% else %}❌{% endif %}
+</td>
+
+<td>
+
+{% if hospital.eta %}
+{{ hospital.eta }} min
+{% else %}
+-
+{% endif %}
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+<br>
+
+<label>Citizen Aadhaar Number</label>
+<input type="text" name="aadhar_number" required>
+
+<br><br>
+
+<button type="submit" name="confirm_hospital">
+🚑 Confirm Selected Hospital
+</button>
+
+</form>
+
+{% endif %}
+
+<hr>
+
+<!-- ========================= -->
+<!-- RECOMMENDED HOSPITAL -->
+<!-- ========================= -->
+
+{% if best_hospital %}
+
+<h3>⭐ Recommended Hospital</h3>
+
+<p>
+
+<b>{{ best_hospital.name }}</b>
+
+</p>
+
+<h4>Hospital Location</h4>
+
+<iframe
+width="100%"
+height="250"
+style="border-radius:10px;border:1px solid #ccc"
+loading="lazy"
+src="https://www.google.com/maps?q={{ best_hospital.latitude }},{{ best_hospital.longitude }}&z=15&output=embed">
+</iframe>
+
+<br><br>
+
+<a target="_blank"
+href="https://www.google.com/maps/dir/?api=1&origin={{ ambulance_lat }},{{ ambulance_lng }}&destination={{ best_hospital.latitude }},{{ best_hospital.longitude }}">
+
+<button>
+Open Route in Google Maps
+</button>
+
+</a>
+
+{% endif %}
+
+<script>
+
+function filterHospitals(){
+
+let input = document.getElementById("hospitalSearch").value.toLowerCase()
+
+let rows = document.querySelectorAll("#hospitalTable tr")
+
+rows.forEach((row,index)=>{
+
+if(index===0) return
+
+if(row.innerText.toLowerCase().includes(input)){
+row.style.display=""
+}
+else{
+row.style.display="none"
+}
+
+})
+
+}
+
+</script>
+
+{% endblock %}

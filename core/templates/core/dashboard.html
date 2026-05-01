@@ -1,0 +1,10 @@
+<h2>Update Hospital ER Status</h2>
+<form method="post">
+  {% csrf_token %}
+  Occupied ER Rooms: <input type="number" name="occupied"><br>
+  ICU Beds Available: <input type="number" name="icu"><br>
+  Cardiologist <input type="checkbox" name="cardio"><br>
+  Neurosurgeon <input type="checkbox" name="neuro"><br>
+  Trauma Team <input type="checkbox" name="trauma"><br>
+  <button type="submit">Update</button>
+</form>

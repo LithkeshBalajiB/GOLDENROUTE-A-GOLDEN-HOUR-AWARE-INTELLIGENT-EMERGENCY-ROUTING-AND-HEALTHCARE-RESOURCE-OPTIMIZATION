@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>🏥 Hospital Dashboard</h2>
+
+<!-- ========================= -->
+<!-- HOSPITAL INFO -->
+<!-- ========================= -->
+
+<h3>Hospital Information</h3>
+
+<p><b>Hospital Name:</b> {{ hospital.name }}</p>
+
+<p>
+
+<b>Current Availability</b><br>
+
+ER Rooms Available: {{ hospital.er_rooms_available }} <br>
+ICU Beds Available: {{ hospital.icu_beds_available }}
+
+</p>
+
+<p>
+
+Cardiologist Available:
+{% if hospital.cardiologist_available %}
+✅
+{% else %}
+❌
+{% endif %}
+
+<br>
+
+Neurosurgeon Available:
+{% if hospital.neurosurgeon_available %}
+✅
+{% else %}
+❌
+{% endif %}
+
+<br>
+
+Trauma Team Available:
+{% if hospital.trauma_team_available %}
+✅
+{% else %}
+❌
+{% endif %}
+
+</p>
+
+<hr>
+
+<!-- ========================= -->
+<!-- UPDATE HOSPITAL STATUS -->
+<!-- ========================= -->
+
+<h3>Update Hospital Availability</h3>
+
+<form method="POST">
+
+{% csrf_token %}
+
+<label>ER Rooms Available</label>
+<input type="number" name="er_rooms_available"
+value="{{ hospital.er_rooms_available }}">
+
+<label>ICU Beds Available</label>
+<input type="number" name="icu_beds_available"
+value="{{ hospital.icu_beds_available }}">
+
+<br>
+
+<h4>Specialists Available</h4>
+
+<table class="spec-table">
+
+<tr>
+
+<td>Cardiologist</td>
+<td>
+<input type="checkbox" name="cardio"
+{% if hospital.cardiologist_available %}checked{% endif %}>
+</td>
+</tr>
+
+<tr>
+
+<td>Neurosurgeon</td>
+<td>
+<input type="checkbox" name="neuro"
+{% if hospital.neurosurgeon_available %}checked{% endif %}>
+</td>
+</tr>
+
+<tr>
+
+<td>Trauma Team</td>
+<td>
+<input type="checkbox" name="trauma"
+{% if hospital.trauma_team_available %}checked{% endif %}>
+</td>
+</tr>
+
+</table>
+
+<br><br>
+
+<button type="submit">
+Update Hospital Status
+</button>
+
+</form>
+
+<hr>
+
+<!-- ========================= -->
+<!-- INCOMING PATIENTS -->
+<!-- ========================= -->
+
+<h3>🚑 Incoming Patients</h3>
+
+{% for transfer in transfers %}
+
+<div class="success">
+
+<h4>Patient Information</h4>
+
+<b>Name:</b> {{ transfer.citizen.name }} <br>
+
+<b>Aadhar Number:</b> {{ transfer.citizen.aadhar_number }} <br>
+
+<b>Comments / Medical Notes:</b> {{ transfer.citizen.comments }} <br>
+
+<b>Emergency Contact:</b> {{ transfer.citizen.emergency_contact }} <br>
+
+<hr>
+
+<h4>Medical Details</h4>
+
+<b>Age:</b> {{ transfer.citizen.age }} <br>
+
+<b>Blood Group:</b> {{ transfer.citizen.blood_group }} <br>
+
+<b>Diabetes:</b> {{ transfer.citizen.diabetes }} <br>
+
+<b>Heart Disease:</b> {{ transfer.citizen.heart_disease }} <br>
+
+<hr>
+
+<h4>Emergency Transport Details</h4>
+
+<b>Specialist Needed:</b>
+
+{% if transfer.patient_type == "cardiac" %}
+Cardiologist ❤️
+{% elif transfer.patient_type == "neuro" %}
+Neurosurgeon 🧠
+{% elif transfer.patient_type == "trauma" %}
+Trauma Team 🚑
+{% else %}
+Unknown
+{% endif %}
+
+<br>
+
+<b>ETA:</b> {{ transfer.eta_minutes }} minutes
+
+<br>
+
+<b>Sent Time:</b> {{ transfer.sent_time }}
+
+</div>
+
+{% empty %}
+
+<p>No incoming patients</p>
+
+{% endfor %}
+
+{% endblock %}  
